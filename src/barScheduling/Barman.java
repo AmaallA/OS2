@@ -356,7 +356,7 @@ public class Barman extends Thread {
             
             // Calculate metrics
             long waitingTime = order.getWaitingTime();      // time spent in queue
-            long responseTime = order.getResponseTime();    // same as waiting time in this simulation
+            long responseTime = order.getResponseTime();    
             long turnaroundTime = order.getTurnaroundTime(); // total time from arrival to completion
             
             // Write one row of data for this order
