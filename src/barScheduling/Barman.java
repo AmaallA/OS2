@@ -12,8 +12,11 @@
 
 package barScheduling;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -337,6 +340,43 @@ public class Barman extends Thread {
     
     private void recordCompletedOrder(DrinkOrder order) throws IOException {
     	// THIS IS THE ONLY FUNCTION YOU MAY CHANGE
+        // create a file writer (true to append to end of file)
+        // try-with-resources ensures file is closed automatically
+        try (FileWriter fw = new FileWriter("predictability_SJF.csv", true)) {
+            
+            // check if file is empty (to write headers)
+            File file = new File("predictability_SJF.csv");
+            boolean isNewFile = !file.exists() || file.length() == 0;
+            
+            if (isNewFile) {
+                // Write CSV headers
+                fw.write("PatronID,DrinkName,PreparationTime,ArrivalTime,ServiceStartTime," +
+                        "CompletionTime,WaitingTime,ResponseTime,TurnaroundTime,Scheduler,OverheadSwitchTime\n");
+            }
+            
+            // Calculate metrics
+            long waitingTime = order.getWaitingTime();      // time spent in queue
+            long responseTime = order.getResponseTime();    // same as waiting time in this simulation
+            long turnaroundTime = order.getTurnaroundTime(); // total time from arrival to completion
+            
+            // Write one row of data for this order
+            fw.write(String.format(Locale.US, "%d,%s,%d,%d,%d,%d,%d,%d,%d,%s,%d\n",
+                order.getOrderer(),                           // Patron ID
+                order.getDrinkName(),                         // Drink name
+                order.getExecutionTime(),                     // Preparation time
+                order.getArrivalTime(),                       // When order arrived
+                order.getServiceStartTime(),                  // When bartender started
+                order.getCompletionTime(),                    // When drink was finished
+                waitingTime,                                  // Queue time
+                responseTime,                                 // Response time
+                turnaroundTime,                               // Total time
+                schedulerName,                                // Which scheduler used
+                switchTime                                    // Switch time between orders
+            ));
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV: " + e.getMessage());
+            throw e; // Re-throw as required by method signature
+        }
     }
 
 }
