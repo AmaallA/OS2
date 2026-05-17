@@ -342,10 +342,10 @@ public class Barman extends Thread {
     	// THIS IS THE ONLY FUNCTION YOU MAY CHANGE
         // create a file writer (true to append to end of file)
         // try-with-resources ensures file is closed automatically
-        try (FileWriter fw = new FileWriter("SwitchTime_Priority.csv", true)) {
+        try (FileWriter fw = new FileWriter("predictability_MLFQ.csv", true)) {
             
             // check if file is empty (to write headers)
-            File file = new File("SwitchTime_Priority.csv");
+            File file = new File("predictability_MLFQ.csv");
             boolean isNewFile = !file.exists() || file.length() == 0;
             
             if (isNewFile) {
